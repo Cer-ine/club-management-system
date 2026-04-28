@@ -79,6 +79,12 @@ public class Committee{
    }
 
 
+//method to check DuplicateID
+public void checkDuplicateID(String id) throws DoublicateIdException{
+if (searchMember(id ) != -1){
+throw new DoublicateIdException(id);}
+
+}
 
 
 

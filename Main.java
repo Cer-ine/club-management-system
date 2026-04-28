@@ -4,7 +4,7 @@ public class Main{
    public static void main(String[]args){
       Scanner input=new Scanner (System.in);
       boolean valid=false;
-
+   
       Club club =new Club ("University Club " );
    
       int choice ;
@@ -63,9 +63,22 @@ public class Main{
                System.out.println("choose member type : \n 1- Board Member . \n 2- Volunteer . ");
                int type = input.nextInt();
                input.nextLine();
-            
-               System.out.println("Enter member ID : ");
-               String id = input.nextLine();
+               
+               String id ="";
+               boolean validId= false;
+               
+               //loop to check and git the ID
+               while (!validId){
+                  System.out.println("Enter member ID : ");
+                  id = input.nextLine();
+                  try{
+                     choosencommittee.checkDuplicateID(id);
+                     validId= true; }
+                  catch (DoublicateIdException e){
+                     System.out.println("---------------");
+                     System.out.println(e.getMessage());
+                     System.out.println("please try antering a different ID");}
+               }//end loop
             
                System.out.println("Enter member name : ");
                String name = input.nextLine();
@@ -259,21 +272,21 @@ public class Main{
                            System.out.println("Position updated successfully!");
                         
                         } else if (mToEdit instanceof Volunteer) {
-                            Volunteer vol = (Volunteer) mToEdit;
-                            System.out.print("Enter the number of hours to add: ");
+                           Volunteer vol = (Volunteer) mToEdit;
+                           System.out.print("Enter the number of hours to add: ");
                            while(!valid){
-                           int newHours = input.nextInt();
-                           input.nextLine();
-                        try{                                                                   
-                           vol.addHours(newHours);
-                           break;
-                          }
-                          catch(IllegalArgumentException e){
-                          System.out.println("Error :"+e.getMessage());
-                          System.out.print("Please enter a vaild number :");
-
-                          }  
-                          }   
+                              int newHours = input.nextInt();
+                              input.nextLine();
+                              try{                                                                   
+                                 vol.addHours(newHours);
+                                 break;
+                              }
+                              catch(IllegalArgumentException e){
+                                 System.out.println("Error :"+e.getMessage());
+                                 System.out.print("Please enter a vaild number :");
+                              
+                              }  
+                           }   
                                     
                         }
                      } else {
