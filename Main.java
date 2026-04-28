@@ -3,6 +3,8 @@ import java.util.Scanner;
 public class Main{
    public static void main(String[]args){
       Scanner input=new Scanner (System.in);
+      boolean valid=false;
+
       Club club =new Club ("University Club " );
    
       int choice ;
@@ -257,12 +259,21 @@ public class Main{
                            System.out.println("Position updated successfully!");
                         
                         } else if (mToEdit instanceof Volunteer) {
-                           Volunteer vol = (Volunteer) mToEdit;
-                           System.out.print("Enter the number of hours to add: ");
+                            Volunteer vol = (Volunteer) mToEdit;
+                            System.out.print("Enter the number of hours to add: ");
+                           while(!valid){
                            int newHours = input.nextInt();
                            input.nextLine();
-                        
+                        try{                                                                   
                            vol.addHours(newHours);
+                           break;
+                          }
+                          catch(IllegalArgumentException e){
+                          System.out.println("Error :"+e.getMessage());
+                          System.out.print("Please enter a vaild number :");
+
+                          }  
+                          }   
                                     
                         }
                      } else {

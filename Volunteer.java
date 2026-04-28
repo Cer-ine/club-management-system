@@ -1,5 +1,4 @@
 public class Volunteer extends Member {
-// Hadeel haaha
 //Attribute
    private int volunteerHours;
 //Constructor
@@ -27,6 +26,9 @@ public class Volunteer extends Member {
     
    }
    public void addHours(int h){
+   if (h<0)                                                                       
+    throw new IllegalArgumentException("Hours canot be negative !");            
+    
       volunteerHours=volunteerHours+h;
       System.out.println("Hours added successfully");
    }
