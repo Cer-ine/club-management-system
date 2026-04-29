@@ -1,5 +1,5 @@
-
-public class BoardMember extends Member {
+import java.io.*;
+public class BoardMember extends Member implements Serializable {
  //Attribute
    private String position;
  //Constructor

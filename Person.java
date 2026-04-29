@@ -1,5 +1,5 @@
-
-public class Person {
+import java.io.*;
+public class Person implements Serializable  {
   //Attribute
    private String id;
    private String name;

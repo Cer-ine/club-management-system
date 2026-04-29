@@ -1,4 +1,5 @@
-public class Volunteer extends Member {
+import java.io.*;
+public class Volunteer  extends Member implements Serializable {
 //Attribute
    private int volunteerHours;
 //Constructor

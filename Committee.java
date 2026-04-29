@@ -1,4 +1,5 @@
-public class Committee{
+import java.io.*;
+public class Committee implements Serializable{
   //Attribute
    private String commName;
    private Member members[];

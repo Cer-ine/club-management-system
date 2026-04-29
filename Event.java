@@ -1,4 +1,5 @@
-public class Event implements Report {
+import java.io.*;
+public class Event implements Serializable ,Report {
   //Attribute
    private String eventName;
    private String date;

@@ -1,5 +1,5 @@
-
-public abstract class Member extends Person implements Report {
+import java.io.*;
+public abstract class Member extends Person implements Report , Serializable {
   //Attribute
    private int joinYear;
    protected boolean isActive;

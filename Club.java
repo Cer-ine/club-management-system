@@ -1,6 +1,6 @@
 import java.util.Scanner ;
-//sham is hear
-public class Club {
+import java.io.*;
+public class Club implements Serializable {
   //Attribute
    private String clubName ; 
    private  Committee [] committees ; 

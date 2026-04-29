@@ -1,12 +1,39 @@
 import java.util.Scanner;
-// hihiihiih
+import java.io.*;
+// static method for save object
 public class Main{
+
+   public static Club loadData() {
+      Club club = null;
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("clubData.dat"))) {
+         club = (Club) ois.readObject();
+         System.out.println("Data loaded successfully from file.");
+      } catch (FileNotFoundException e) {
+         System.out.println("No previous data found. Starting a new system.");
+      } catch (IOException | ClassNotFoundException e) {
+         System.out.println("Error loading data: " + e.getMessage());
+      }
+      return club;
+   }
+
+   public static void saveData(Club club) {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("clubData.dat"))) {
+         oos.writeObject(club);
+         System.out.println("Data saved successfully to file.");
+      } catch (IOException e) {
+         System.out.println("Error saving data: " + e.getMessage());
+      }
+   }
+
    public static void main(String[]args){
       Scanner input=new Scanner (System.in);
       boolean valid=false;
-   
-      Club club =new Club ("University Club " );
-   
+   //read club
+      Club club = loadData();
+        
+      if (club == null) {
+         club = new Club("University Club");
+      }
       int choice ;
       String choosencommitteename=""  ; 
       Committee choosencommittee  ; 
@@ -346,9 +373,9 @@ public class Main{
          
          //exit
             case 10:
-               System.out.println("thank you");
-               break;
-         }
+               System.out.println("Exiting the system...");
+               saveData(club);
+               break;         }
       
       
       }while(choice !=10);
@@ -357,7 +384,7 @@ public class Main{
    
    
    
-   
+      input.close();
    
    
    
