@@ -51,7 +51,7 @@ public class Main{
          System.out.println("7- Count Active Members  ");
          System.out.println("8- Add an Event  ");
          System.out.println("9- Display Event Report  ");
-         System.out.println("10- Exit ");
+         System.out.println("10- Save and Exit ");
          System.out.println("==================================");
          System.out.println(" Enter your choice: ");
          choice= input.nextInt();
@@ -63,11 +63,13 @@ public class Main{
                System.out.println("Enter committee name : ");
                String commName= input.nextLine();
                if(club.findCommittee(commName) !=null){
-                  System.out.println("the committee  already exist!");
+                  System.out.println("the committee is already exist!");
                   break;}
+               System.out.println("Enter committee size  : ");
+               int size = input.nextInt();
+               input.nextLine();
             
-            
-               Committee committee=new Committee(commName);
+               Committee committee=new Committee(commName,size);
                if(club.addCommittee(committee))
                   System.out.println("Committee added successfully. ");
                else 
@@ -76,102 +78,13 @@ public class Main{
          
          // Add a Member 
             case 2:
-               System.out.println("Enter committee name to add member to : ");
-               choosencommitteename= input.next();
-               choosencommittee=club.findCommittee(choosencommitteename);
-            
-               if(choosencommittee==null){
-                  System.out.println("Committee not found . ");
-                  break;
-               }
-            
-               System.out.println("choose member type : \n 1- Board Member . \n 2- Volunteer . ");
-               int type = input.nextInt();
-               input.nextLine();
                
-               String id ="";
-               boolean validId= false;
-               
-               //loop to check and git the ID
-               while (!validId){
-                  System.out.println("Enter member ID : ");
-                  id = input.nextLine();
-                  try{
-                     choosencommittee.checkDuplicateID(id);
-                     validId= true; }
-                  catch (DoublicateIdException e){
-                     System.out.println("---------------");
-                     System.out.println(e.getMessage());
-                     System.out.println("please try antering a different ID");}
-               }//end loop
-            
-               System.out.println("Enter member name : ");
-               String name = input.nextLine();
-            
-            
-               System.out.println("Enter join year : ");
-               int year = input.nextInt();
-               //input.nextLine();
-            
-            
-               System.out.println("is active (true/false) :");
-               boolean active = input.nextBoolean();
-               input.nextLine();
-            
-               Member member=null;
-               if(type==1){
-               
-                  String position = "";
-                  int posChoice;
-               
-               
-                  do {
-                     System.out.println("Choose Board Member position:");
-                     System.out.println("1- Leader");
-                     System.out.println("2- Assistant");
-                     System.out.println("3- Coordinator");
-                     System.out.print("Enter your choice (1-3): ");
-                  
-                     posChoice = input.nextInt();
-                     input.nextLine(); 
-                  
-                     if (posChoice == 1) {
-                        position = "Leader";
-                     } else if (posChoice == 2) {
-                        position = "Assistant";
-                     } else if (posChoice == 3) {
-                        position = "Coordinator";
-                     } else {
-                        System.out.println("Invalid choice! Please enter 1, 2, or 3.\n");
-                     }
-                  } while (posChoice < 1 || posChoice > 3); 
-               
-               
-                  member = new BoardMember(position, year, active, id, name);
-               }
-               else if(type==2){
-               
-                  System.out.println("Enter volunteer hours :");
-                  int hours = input.nextInt();
-                  input.nextLine();
-               
-                  member=new Volunteer(hours,year,active,id,name);
-               
-               }
-               else{
-                  System.out.println("Invalid type.");
-                  break;
-               
-               
-               }
-            
-               if(choosencommittee.addMember(member))
-                  System.out.println("Member added successfully.");
-               else
-                  System.out.println("Cannot add member.");
-            
-            
-               break;
+    InputGUI inputScreen = new InputGUI(null, true, club);
+                    
+                    //inputScreen.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    
+                    inputScreen.setVisible(true);
+                    break;
          
          
          //Remove a Member 
@@ -205,7 +118,7 @@ public class Main{
                   if(choosencommittee!=null){
                      System.out.println("Enter member ID : ");
                      String ID= input.next();
-                     Member m =choosencommittee.searchMember(ID) ; 
+                     Member m = choosencommittee.getMember(choosencommittee.searchMember(ID)) ; 
                      if (m != null )
                         m.displayReport() ; 
                   }
@@ -222,17 +135,13 @@ public class Main{
                choosencommittee = club.findCommittee(choosencommitteename);
             
                if(choosencommittee != null) {
-                  if(choosencommittee.getMembers().isEmpty() ) {
+                  if(choosencommittee.getNumOfMembers() == 0) {
                      System.out.println("No members in this committee.");
                   } else {
                      System.out.println("=== Rewards Report ===");
-                     Node<Member> current = choosencommittee.getMembers().getFirstNode();
-                  
-                     while (current != null) {
-                        Member m = current.data;
-                        System.out.println("Member: " + m.getName() +
-                                   " | Reward: " + m.calculateReward());
-                        current = current.nextNode;
+                     for(int i = 0; i < choosencommittee.getNumOfMembers(); i++) {
+                        Member m = choosencommittee.getMember(i);
+                        System.out.println("Member: " + m.getName() + " | Reward: " + m.calculateReward());
                      }
                   }
                } else {
@@ -251,9 +160,10 @@ public class Main{
                   System.out.println("Enter member ID to edit: ");
                   String editID = input.nextLine();
                
-                  Member mToEdit = choosencommittee.searchMember(editID);
+                  int memberIndex = choosencommittee.searchMember(editID);
                
-                  if (mToEdit != null) {
+                  if (memberIndex != -1) {
+                     Member mToEdit = choosencommittee.getMember(memberIndex);
                      System.out.println("1- Edit Name\n2- Edit Active Status");
                   
                      if (mToEdit instanceof BoardMember) {
@@ -336,7 +246,7 @@ public class Main{
             
                if(choosencommittee != null) {
                
-                  int activeCount = choosencommittee.countActiveMembers();
+                  int activeCount = choosencommittee.countActiveMembers(0);
                   System.out.println("Total Active Members in '" + choosencommitteename + "' is: " + activeCount);
                } else {
                   System.out.println("Committee not found.");

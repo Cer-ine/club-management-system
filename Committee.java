@@ -2,85 +2,87 @@ import java.io.*;
 public class Committee implements Serializable{
   //Attribute
    private String commName;
-   private List<Member> members;
-   
+   private Member members[];
+   private int numOfMembers;
 
-   public Committee(String co){
+   public Committee(String co,int size){
       commName=co;
-      members=new List<Member> ();
-      
+      members=new Member[size];
+      numOfMembers=0;
    }
 /*copy constracter*/
    public Committee(Committee obj){
       commName=obj.commName;
-      members=new List<Member> ();
-      Node<Member> current = obj.members.getFirstNode();
-        while (current != null) {
-            this.members.insertAtBack(current.data); 
-            current = current.nextNode;
-        }
-    }
+      members=new Member[obj.members.length];
+      numOfMembers=obj.numOfMembers;
+      for(int i = 0;i<numOfMembers;i++)
+      {members[i]=obj.members[i];}
     
+   }
 //getters
    public String getCommName() { 
       return commName ; 
    }
-   //get the list of members
-   public List<Member> getMembers() {
-    return members;
-}
-   
+   public int getNumOfMembers(){
+      return numOfMembers;
+   }
 //add member
    public boolean addMember(Member m){
-         if (searchMember(m.getId())!=null){
+      if(numOfMembers>=members.length)
+         return false;
+      else{
+         if (searchMember(m.getId())!=-1){
             System.out.println("a member with this ID already exist!");
             return false;}
          else
-            members.insertAtBack(m) ;
+            members[numOfMembers++]=m;
          return true;
-      }
+      }}
 //remove member
    public boolean removeMember(String id){
-      if(searchMember(id) != null){
-      if(members.remove(searchMember(id))) {
+      int indexMember=searchMember(id);
+      if(indexMember!=-1){
+         members[indexMember]=members[numOfMembers-1];
+         members[numOfMembers-1]=null;
+         numOfMembers--;
          return true ;}
-         }
-     return false ; 
+      else 
+         return false;
    }
 
-//return the member with the given ID
-   public Member searchMember(String id ){
-   Node <Member> current= members.getFirstNode() ; 
-      while (current != null ) {
-         if(id.equals(current.getData().getId())){
-            return current.getData(); 
-         }
-         current=current.nextNode ;
+//return the index of the member
+   public int searchMember(String id ){
+      for(int i=0;i<numOfMembers;i++){
+         if (id.equals(members[i].getId()))
+            return i ;
       }
-     
-      return null ; 
+      return -1 ; 
    }
-
+//get member
+   public Member getMember(int i){
+      if ( i<0 || i > members.length) {
+         System.out.println("Member not found " ) ;
+         return null ; 
+      }
+   
+      return members[i] ; 
+   }
 //count active members
 
-    public int countActiveMembers() {
-        int count = 0;
-        Node<Member> current = members.getFirstNode();
-
-        while (current != null) {
-            if (current.data.isIsActive()) {
-                count++;
-            }
-            current = current.nextNode;
-        }
-
-        return count;
-    }
+   public int countActiveMembers(int index){
+      if(index>=numOfMembers)
+         return 0;
+   
+      if(members[index].isIsActive()==true)
+         return 1+countActiveMembers(index+1);
+      else
+         return 0+ countActiveMembers(index+1);
+   }
 
 
 //method to check DuplicateID
 public void checkDuplicateID(String id) throws DoublicateIdException{
-if (searchMember(id ) != null){
+if (searchMember(id ) != -1){
 throw new DoublicateIdException(id);}
 
 }
