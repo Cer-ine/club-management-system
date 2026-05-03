@@ -3,51 +3,51 @@ import java.io.*;
 public class Club implements Serializable {
   //Attribute
    private String clubName ; 
-   private  List<Committee> committees ; 
-   private List<Event> events ;  
-   
+   private  Committee [] committees ; 
+   private Event [] events ; 
+   private int numOfCommittees ; 
+   private int numOfEvents ;
 //constructor
    public Club (String name  ) {
       clubName=name;
-      committees=new List<Committee>() ; 
-      events = new List<Event> () ; 
-      
+      committees=new Committee [10] ; 
+      events = new Event [10] ; 
+      numOfCommittees=0;
+      numOfEvents=0;
    }
 //add committee
    public boolean addCommittee ( Committee c ) {
-      
-         committees.insertAtBack(c);  
-         
+      if ( numOfCommittees < events.length ) {
+         committees[numOfCommittees++] = new Committee (c) ; 
          return true ; 
-   
+      }
+      return false ; 
    } 
 //add event
    public boolean addEvent ( Event e ) { 
-      events.insertAtBack(e);  
-         
-         return true ;
+      if (numOfEvents < events.length ) {
+         events[numOfEvents++]=new Event (e) ; 
+         return true ; 
+      } 
+      return false ; 
    } 
 
 // find committee method 
    public Committee findCommittee(String name ){
-   Node <Committee> current= committees.getFirstNode() ; 
-      while (current != null ) {
-         if(current.getData().getCommName().equalsIgnoreCase(name)){
-            return current.getData(); 
+      for(int i=0;i<numOfCommittees;i++){
+         if(committees[i].getCommName().equalsIgnoreCase(name)){
+         
+            return committees[i]; 
          }
-         current=current.nextNode ;
       }
    
       return null;
    }
 //get event
    public Event getEvent (String n ) {
-       Node <Event> current= events.getFirstNode() ; 
-      while (current != null ) {
-         if(current.getData().getName().equals(n)){
-            return current.getData(); 
-         }
-         current=current.nextNode ;
+      for ( int i = 0 ; i <numOfEvents ; i ++ ) {
+         if ( events[i].getName().equals(n) ) 
+            return events[i] ; 
       }
       System.out.println("Event not found");
       return null ; 
