@@ -107,23 +107,30 @@ public class Main{
          
          //display report of member
             case 4: 
-               {
-                  System.out.println("Enter committee name of the member : ");
-                  choosencommitteename= input.nextLine();
-                  choosencommittee=club.findCommittee(choosencommitteename);
                
-                  if(choosencommittee!=null){
-                     System.out.println("Enter member ID : ");
-                     String ID= input.next();
-                     Member m =choosencommittee.searchMember(ID) ; 
-                     if (m != null )
-                        m.displayReport() ; 
-                  }
-                  else 
-                     System.out.println("Committee not found . ");
-               
-               }
-               break;
+                {
+    System.out.println("Enter committee name of the member: ");
+    choosencommitteename = input.nextLine();
+    choosencommittee = club.findCommittee(choosencommitteename);
+
+    if (choosencommittee != null) {
+        System.out.println("Enter member ID: ");
+        String ID = input.next();
+        
+        Member m = choosencommittee.searchMember(ID);
+        
+        if (m != null) {
+            java.awt.EventQueue.invokeLater(() -> {
+                new outframgui(m).setVisible(true);
+            });
+        } else {
+            System.out.println("Member not found.");
+        }
+    } else {
+        System.out.println("Committee not found.");
+    }
+}
+break;
          
          //calculate rewards
             case 5:
@@ -284,7 +291,7 @@ public class Main{
          
          //exit
             case 10:
-               System.out.println("Exiting the system...");
+               System.out.println("Exiting the system...Thank you");
                saveData(club);
                break;         }
       
