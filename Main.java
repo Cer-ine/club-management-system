@@ -75,104 +75,14 @@ public class Main{
                break;
          
          // Add a Member 
-            case 2:
-               System.out.println("Enter committee name to add member to : ");
-               choosencommitteename= input.next();
-               choosencommittee=club.findCommittee(choosencommitteename);
-            
-               if(choosencommittee==null){
-                  System.out.println("Committee not found . ");
-                  break;
-               }
-            
-               System.out.println("choose member type : \n 1- Board Member . \n 2- Volunteer . ");
-               int type = input.nextInt();
-               input.nextLine();
+             case 2:
                
-               String id ="";
-               boolean validId= false;
-               
-               //loop to check and git the ID
-               while (!validId){
-                  System.out.println("Enter member ID : ");
-                  id = input.nextLine();
-                  try{
-                     choosencommittee.checkDuplicateID(id);
-                     validId= true; }
-                  catch (DoublicateIdException e){
-                     System.out.println("---------------");
-                     System.out.println(e.getMessage());
-                     System.out.println("please try antering a different ID");}
-               }//end loop
-            
-               System.out.println("Enter member name : ");
-               String name = input.nextLine();
-            
-            
-               System.out.println("Enter join year : ");
-               int year = input.nextInt();
-               //input.nextLine();
-            
-            
-               System.out.println("is active (true/false) :");
-               boolean active = input.nextBoolean();
-               input.nextLine();
-            
-               Member member=null;
-               if(type==1){
-               
-                  String position = "";
-                  int posChoice;
-               
-               
-                  do {
-                     System.out.println("Choose Board Member position:");
-                     System.out.println("1- Leader");
-                     System.out.println("2- Assistant");
-                     System.out.println("3- Coordinator");
-                     System.out.print("Enter your choice (1-3): ");
-                  
-                     posChoice = input.nextInt();
-                     input.nextLine(); 
-                  
-                     if (posChoice == 1) {
-                        position = "Leader";
-                     } else if (posChoice == 2) {
-                        position = "Assistant";
-                     } else if (posChoice == 3) {
-                        position = "Coordinator";
-                     } else {
-                        System.out.println("Invalid choice! Please enter 1, 2, or 3.\n");
-                     }
-                  } while (posChoice < 1 || posChoice > 3); 
-               
-               
-                  member = new BoardMember(position, year, active, id, name);
-               }
-               else if(type==2){
-               
-                  System.out.println("Enter volunteer hours :");
-                  int hours = input.nextInt();
-                  input.nextLine();
-               
-                  member=new Volunteer(hours,year,active,id,name);
-               
-               }
-               else{
-                  System.out.println("Invalid type.");
-                  break;
-               
-               
-               }
-            
-               if(choosencommittee.addMember(member))
-                  System.out.println("Member added successfully.");
-               else
-                  System.out.println("Cannot add member.");
-            
-            
-               break;
-         
+                   InputGUI inputScreen = new InputGUI(null, true, club);
+                    
+                    //inputScreen.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    
+                    inputScreen.setVisible(true);
+                    break;
          
          //Remove a Member 
             case 3:

@@ -18,10 +18,14 @@ public class InputGUI extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
     }
-public InputGUI(Club club) {
+public InputGUI(java.awt.Frame parent, boolean modal, Club club) {
+    super(parent, modal);
     initComponents();
+    System.out.println("GUI opened");
     this.club = club;
 
+setLocationRelativeTo(null); 
+setSize(500, 600); 
    
     cbPositon.setVisible(false);
     txtHours.setVisible(false);
@@ -56,6 +60,7 @@ public InputGUI(Club club) {
         jPanel5 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         txtCommittee = new javax.swing.JTextField();
@@ -132,15 +137,25 @@ public InputGUI(Club club) {
 
         jPanel6.setBackground(new java.awt.Color(204, 204, 204));
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI Black", 1, 20)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel1.setText("Add Member Form");
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(21, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(22, 22, 22))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 62, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(14, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -154,7 +169,7 @@ public InputGUI(Club club) {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(76, 76, 76)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -171,12 +186,12 @@ public InputGUI(Club club) {
         jLabel5.setBackground(new java.awt.Color(204, 204, 204));
         jLabel5.setFont(new java.awt.Font("Segoe UI Emoji", 0, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel5.setText("Enter committee Name : ");
+        jLabel5.setText("Enter committe Name : ");
         jLabel5.setOpaque(true);
 
         txtCommittee.setBackground(new java.awt.Color(204, 204, 204));
-        txtCommittee.setForeground(new java.awt.Color(153, 153, 153));
-        txtCommittee.setText("committe naem");
+        txtCommittee.setForeground(new java.awt.Color(102, 102, 102));
+        txtCommittee.setText("..........");
         txtCommittee.addActionListener(this::txtCommitteeActionPerformed);
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
@@ -209,7 +224,7 @@ public InputGUI(Club club) {
         jLabel6.setOpaque(true);
 
         txtID.setBackground(new java.awt.Color(204, 204, 204));
-        txtID.setForeground(new java.awt.Color(153, 153, 153));
+        txtID.setForeground(new java.awt.Color(102, 102, 102));
         txtID.setText("XXXXX");
         txtID.addActionListener(this::txtIDActionPerformed);
 
@@ -236,7 +251,7 @@ public InputGUI(Club club) {
         jPanel11.setBackground(new java.awt.Color(204, 204, 204));
 
         txtName.setBackground(new java.awt.Color(204, 204, 204));
-        txtName.setForeground(new java.awt.Color(153, 153, 153));
+        txtName.setForeground(new java.awt.Color(102, 102, 102));
         txtName.setText("Name");
         txtName.addActionListener(this::txtNameActionPerformed);
 
@@ -310,8 +325,8 @@ public InputGUI(Club club) {
         jLabel8.setOpaque(true);
 
         txtYear.setBackground(new java.awt.Color(204, 204, 204));
-        txtYear.setForeground(new java.awt.Color(153, 153, 153));
-        txtYear.setText("ex:20");
+        txtYear.setForeground(new java.awt.Color(102, 102, 102));
+        txtYear.setText("2020");
         txtYear.addActionListener(this::txtYearActionPerformed);
 
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
@@ -354,7 +369,7 @@ public InputGUI(Club club) {
 
         cbPositon.setBackground(new java.awt.Color(204, 204, 204));
         cbPositon.setForeground(new java.awt.Color(102, 102, 102));
-        cbPositon.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Leader 1", "Assistant  2", "Coordinator 3", " " }));
+        cbPositon.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Leader ", "Assistant  ", "Coordinator ", " " }));
         cbPositon.setOpaque(true);
         cbPositon.addActionListener(this::cbPositonActionPerformed);
 
@@ -489,6 +504,11 @@ try {
 // Name
 String name = txtName.getText();
 
+if (name.isEmpty()) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Enter name");
+    return;
+}
+
 // Year
 int year;
 try {
@@ -613,6 +633,7 @@ if (c.addMember(member)) {
     private javax.swing.JComboBox<String> cbPositon;
     private javax.swing.JCheckBox chkActive;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
