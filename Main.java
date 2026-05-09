@@ -29,7 +29,7 @@ public class Main extends JFrame {
 // Create Menu Buttons  
         String[] labels = {"1. Add Committee", "2. Add New Member", "3. Edit Member Info", 
                            "4. View Reports", "5. Manage Events", "6. Save & Exit"};
-        // to add carfly Buttons 
+        // to add Buttons 
         int yPos = 110;
         for (int i = 0; i < labels.length; i++) {
             JButton btn = new JButton(labels[i]);
@@ -239,7 +239,7 @@ class ReportsDashboardFrame extends BaseFrame {
             if (combo.getSelectedIndex() == 0) {
                 if (currentComm != null) { 
                     Member m = currentComm.searchMember(tS.getText()); 
-                    if (m != null) outputArea.setText(m.displayReport()); // استدعاء ميثود الـ String
+                    if (m != null) outputArea.setText(m.displayReport()); //
                     else outputArea.setText("Member Not Found!");
                 } else {
                     outputArea.setText("Committee Not Found!");
@@ -247,7 +247,7 @@ class ReportsDashboardFrame extends BaseFrame {
             } 
             else if (combo.getSelectedIndex() == 1) {
                 Event ev = club.getEvent(tS.getText()); 
-                if (ev != null) outputArea.setText(ev.displayReport()); // استدعاء ميثود الـ String
+                if (ev != null) outputArea.setText(ev.displayReport()); // 
                 else outputArea.setText("Event Not Found!");
             } 
             else {
@@ -311,7 +311,7 @@ class AddMemberFrame extends BaseFrame {
         actionButton.addActionListener(e -> {
             try {
                 Committee c = club.findCommittee(txtComm.getText());
-                if (c == null) throw new Exception("Committee Not Found!"); //throw new catch if committe not found
+                if (c == null) throw new Exception("Committee Not Found!"); //throw new exception if committe not found
                 c.checkDuplicateID(txtID.getText()); //doublicteIdException
 
                 Member m;
