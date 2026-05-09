@@ -62,7 +62,16 @@ public class Main extends JFrame {
     private void loadData() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             club = (Club) ois.readObject(); // Read the club object from the file
-        } catch (Exception e) { club = new Club("University Club"); } 
+        } catch (FileNotFoundException e) {
+        
+        JOptionPane.showMessageDialog(this," No previous data found. Starting a new system ");
+        club = new Club("University Club");
+
+    } catch (IOException | ClassNotFoundException e) {
+        
+        JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
+        club = new Club("University Club"); 
+    }
     }
 
     private void saveData() {
@@ -77,7 +86,7 @@ public class Main extends JFrame {
     }
 }
 
-//creat basefream to make all frame extends
+//creat basefream to make all frame extend it
 class BaseFrame extends JFrame {
     protected JPanel leftPanel, rightPanel;
     protected JButton actionButton;
