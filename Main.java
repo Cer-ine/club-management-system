@@ -178,7 +178,7 @@ class EditMemberFrame extends BaseFrame {
                 
                 JOptionPane.showMessageDialog(this, "Updated Successfully!");
                 dispose(); //close window
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException ex) { //catch if hours<0
                 
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             } 
@@ -189,45 +189,72 @@ class EditMemberFrame extends BaseFrame {
 
 class ReportsDashboardFrame extends BaseFrame {
     public ReportsDashboardFrame(Club club) {
-        super("System Reports", "Run displayReport()");
+        super("System Reports", "Run Report");
+        
+        // i add lebal to count active member
+        JLabel lblActiveCount = new JLabel("Active Members: 0");
+        lblActiveCount.setFont(new Font("Arial", Font.BOLD, 15));
+        lblActiveCount.setForeground(new Color(0, 102, 0)); 
+        lblActiveCount.setBounds(200, 10, 250, 30); 
+        rightPanel.add(lblActiveCount);
+
         JTextArea outputArea = new JTextArea();
         outputArea.setEditable(false);
         outputArea.setFont(new Font("Monospaced", Font.BOLD, 14));
-        outputArea.setBackground(Color.BLACK); outputArea.setForeground(Color.GREEN);
-        JScrollPane scroll = new JScrollPane(outputArea); scroll.setBounds(20, 200, 460, 280);
+        outputArea.setBackground(Color.BLACK); 
+        outputArea.setForeground(Color.GREEN);
+        JScrollPane scroll = new JScrollPane(outputArea); 
+        scroll.setBounds(20, 200, 460, 280);
         rightPanel.add(scroll);
 
         String[] types = {"Member Report", "Event Report", "All Committee Rewards"};
         JComboBox<String> combo = new JComboBox<>(types);
         JTextField tC = new JTextField(), tS = new JTextField();
-        addField("Type:", combo, 30); addField("Committee:", tC, 80); addField("ID/Event:", tS, 130);
-//handled action
+        
+        addField("Type:", combo, 50); 
+        addField("Committee:", tC, 100); 
+        addField("ID/Event:", tS, 150);
+        //handled action 
         actionButton.addActionListener(e -> {
-            outputArea.setText(""); //to clear
-            PrintStream oldOut = System.out; // the consol
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(baos));
+            outputArea.setText(""); // to clean
             
-            
-            try {
-                if (combo.getSelectedIndex() == 0) {
-                    Committee c = club.findCommittee(tC.getText());
-                    if (c != null) { Member m = c.searchMember(tS.getText()); if (m != null) m.displayReport(); } //display report
-                } else if (combo.getSelectedIndex() == 1) {
-                    Event ev = club.getEvent(tS.getText()); if (ev != null) ev.displayReport(); //display report
+            // find committe and count member
+            Committee currentComm = club.findCommittee(tC.getText());
+            if (currentComm != null) {
+                lblActiveCount.setText("Active Members (" + currentComm.getCommName() + "): " + currentComm.countActiveMembers());
+            } else {
+                lblActiveCount.setText("Active Members: 0");
+            }
+
+            // for displayReport
+            if (combo.getSelectedIndex() == 0) {
+                if (currentComm != null) { 
+                    Member m = currentComm.searchMember(tS.getText()); 
+                    if (m != null) outputArea.setText(m.displayReport()); // استدعاء ميثود الـ String
+                    else outputArea.setText("Member Not Found!");
                 } else {
-                    Committee c = club.findCommittee(tC.getText());
-                    if (c != null) {
-                        System.out.println("=== Rewards for " + c.getCommName() + " ===");  // to calculate reward
-                        Node<Member> curr = c.getMembers().getFirstNode();
-                        while(curr != null) {
-                            System.out.println("Member: " + curr.data.getName() + " | Reward: " + curr.data.calculateReward());
-                            curr = curr.nextNode;
-                        }
-                    }
+                    outputArea.setText("Committee Not Found!");
                 }
-            } finally {
-                System.setOut(oldOut); outputArea.setText(baos.toString()); //close console
+            } 
+            else if (combo.getSelectedIndex() == 1) {
+                Event ev = club.getEvent(tS.getText()); 
+                if (ev != null) outputArea.setText(ev.displayReport()); // استدعاء ميثود الـ String
+                else outputArea.setText("Event Not Found!");
+            } 
+            else {
+                //for count Rewards
+                if (currentComm != null) {
+                    String report = "=== Rewards for " + currentComm.getCommName() + " ===\n";
+                    
+                    Node<Member> curr = currentComm.getMembers().getFirstNode();
+                    while(curr != null) {
+                        report += "Member: " + curr.data.getName() + " | Reward: " + curr.data.calculateReward() + "\n";
+                        curr = curr.nextNode;
+                    }
+                    outputArea.setText(report); 
+                } else {
+                    outputArea.setText("Committee Not Found!");
+                }
             }
         });
     }
@@ -237,39 +264,60 @@ class ReportsDashboardFrame extends BaseFrame {
 class AddMemberFrame extends BaseFrame {
     public AddMemberFrame(Club club) {
         super("Add Member Form", "ADD Member");
-        JTextField tC = new JTextField(), tI = new JTextField(), tN = new JTextField(), tY = new JTextField("2026");
-        JCheckBox cA = new JCheckBox("Active Member");
-        JRadioButton rbV = new JRadioButton("Volunteer"), rbB = new JRadioButton("Board");
-        ButtonGroup bg = new ButtonGroup(); bg.add(rbV); bg.add(rbB);
-        JComboBox<String> cP = new JComboBox<>(new String[]{"Leader", "Assistant", "Coordinator"});
-        JTextField tH = new JTextField();
-        tH.setVisible(false); cP.setVisible(false);
+
+        JTextField txtComm = new JTextField(), txtID = new JTextField(), txtName = new JTextField(), txtYear = new JTextField("2026");
+        JCheckBox chkActive = new JCheckBox("Active Member");
         
-        addField("Committee:", tC, 40); addField("ID:", tI, 90); addField("Name:", tN, 140);
-        addField("Year:", tY, 190); addField("Active?", cA, 240);
+        JRadioButton rbVol = new JRadioButton("Volunteer"), rbBoard = new JRadioButton("Board");
+        ButtonGroup bg = new ButtonGroup(); bg.add(rbVol); bg.add(rbBoard);
+
         
-        JPanel p = new JPanel(); p.setBorder(BorderFactory.createTitledBorder("Type"));
-        p.setBounds(40, 280, 400, 50); p.add(rbV); p.add(rbB);
-        rightPanel.add(p);
+        JLabel lblSpecial = new JLabel("Special Info:");
+        JComboBox<String> comboPos = new JComboBox<>(new String[]{"Leader", "Assistant", "Coordinator"});
+        JTextField txtHours = new JTextField();
         
-        rbB.addActionListener(e -> { cP.setVisible(true); tH.setVisible(false); });
-        rbV.addActionListener(e -> { cP.setVisible(false); tH.setVisible(true); });
-       
-// handled action
-        actionButton.addActionListener(e -> { 
+        lblSpecial.setBounds(40, 340, 150, 30);
+        comboPos.setBounds(200, 340, 240, 30);
+        txtHours.setBounds(200, 340, 240, 30);
+        
+        comboPos.setVisible(false); txtHours.setVisible(false); lblSpecial.setVisible(false);
+
+        addField("Committee Name:", txtComm, 40);
+        addField("ID:", txtID, 90);
+        addField("Name:", txtName, 140);
+        addField("Join Year:", txtYear, 190);
+        addField("Active?", chkActive, 240);
+
+        JPanel pnlType = new JPanel();
+        pnlType.setBorder(BorderFactory.createTitledBorder("Type of Member"));
+        pnlType.setBounds(40, 280, 400, 50);
+        pnlType.add(rbVol); pnlType.add(rbBoard);
+        rightPanel.add(pnlType);
+        rightPanel.add(lblSpecial); rightPanel.add(comboPos); rightPanel.add(txtHours);
+
+        rbBoard.addActionListener(e -> { comboPos.setVisible(true); txtHours.setVisible(false); lblSpecial.setVisible(true); lblSpecial.setText("Choose Position:"); });
+        rbVol.addActionListener(e -> { comboPos.setVisible(false); txtHours.setVisible(true); lblSpecial.setVisible(true); lblSpecial.setText("Enter Hours:"); });
+
+        //handled action
+        actionButton.addActionListener(e -> {
             try {
-                Committee c = club.findCommittee(tC.getText());
-                if (c == null) throw new Exception("Not Found"); //throe exception if committe not foind
-                c.checkDuplicateID(tI.getText()); //DoublicatedException
-                Member m = rbB.isSelected() ? //add member
-                    new BoardMember((String)cP.getSelectedItem(), Integer.parseInt(tY.getText()), cA.isSelected(), tI.getText(), tN.getText()) :
-                    new Volunteer(Integer.parseInt(tH.getText()), Integer.parseInt(tY.getText()), cA.isSelected(), tI.getText(), tN.getText());
-                if(c.addMember(m)) { JOptionPane.showMessageDialog(this, "Added!"); dispose(); }
-            } catch (Exception ex) { JOptionPane.showMessageDialog(this, ex.getMessage()); }
+                Committee c = club.findCommittee(txtComm.getText());
+                if (c == null) throw new Exception("Committee Not Found!"); //throw new catch if committe not found
+                c.checkDuplicateID(txtID.getText()); //doublicteIdException
+
+                Member m;
+                if (rbBoard.isSelected()) 
+                    m = new BoardMember((String)comboPos.getSelectedItem(), Integer.parseInt(txtYear.getText()), chkActive.isSelected(), txtID.getText(), txtName.getText());
+                else if (rbVol.isSelected())
+                    m = new Volunteer(Integer.parseInt(txtHours.getText()), Integer.parseInt(txtYear.getText()), chkActive.isSelected(), txtID.getText(), txtName.getText());
+                else throw new Exception("Please select member type!");
+
+                if(c.addMember(m)) { JOptionPane.showMessageDialog(this, "Member Added Successfully!"); dispose(); }
+            } catch (DoublicateIdException ex) { JOptionPane.showMessageDialog(this, ex.getMessage()); //catchers
+            } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage()); }
         });
     }
 }
-
 class AddCommitteeFrame extends BaseFrame {
     public AddCommitteeFrame(Club club) {
         super("Add Committee", "Save");
@@ -286,6 +334,7 @@ class EventFrame extends BaseFrame {
         super("Manage Events", "Save");
         JTextField n = new JTextField(), d = new JTextField(), l = new JTextField();
         addField("Name:", n, 50); addField("Date:", d, 100); addField("Loc:", l, 150);
+        //handled action
         actionButton.addActionListener(e -> {
             if(club.addEvent(new Event(n.getText(), d.getText(), l.getText()))) { JOptionPane.showMessageDialog(this, "Added!"); dispose(); }
         });

@@ -1,3 +1,3 @@
 public interface Report {
-   public tring displayReport () ; 
+   public String displayReport () ; 
 }
