@@ -41,15 +41,14 @@ when the even become old the rate will decrese and if the user inters the wrong 
 
 //(ovrride method) display report
 
-   public void displayReport(){
-      System.out.println("================== Event Report =====================" ) ; 
-      System.out.println("| name : "+ eventName );
-      System.out.println("| date  : "+ date );
-      System.out.println("| location : "+ location );
-      System.out.println("| evaluation : "+ calculateRating()+ " stars " );
-      System.out.println("===================================================== " );
-     
-   }
+   public String displayReport() {
+    String info = "--- Event Details ---\n";
+    info += "Event: " + this.eventName + "\n";
+    info += "Date: " + this.date + "\n";
+    info += "Location: " + this.location + "\n";
+    info += "stars : " + calculateRating() + "\n";
+    return info;
+}
 
 
 }

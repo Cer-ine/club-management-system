@@ -1,340 +1,351 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
-// static method for save object
-public class Main{
 
-   public static Club loadData() {
-      Club club = null;
-      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("clubData.dat"))) {
-         club = (Club) ois.readObject();
-         System.out.println("Data loaded successfully from file.");
-      } catch (FileNotFoundException e) {
-         System.out.println("No previous data found. Starting a new system.");
-      } catch (IOException | ClassNotFoundException e) {
-         System.out.println("Error loading data: " + e.getMessage());
-      }
-      return club;
-   }
+public class Main extends JFrame {
+    private Club club;
+    private static final String FILE_NAME = "clubData.dat";
 
-   public static void saveData(Club club) {
-      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("clubData.dat"))) {
-         oos.writeObject(club);
-         System.out.println("Data saved successfully to file.");
-      } catch (IOException e) {
-         System.out.println("Error saving data: " + e.getMessage());
-      }
-   }
+    public Main() {
+        loadData(); // Load existing data from the file when the app starts
+        if (club == null) club = new Club("University Club");
 
-   public static void main(String[]args){
-      Scanner input=new Scanner (System.in);
-      boolean valid=false;
-   //read club
-      Club club = loadData();
-        
-      if (club == null) {
-         club = new Club("University Club");
-      }
-      int choice ;
-      String choosencommitteename=""  ; 
-      Committee choosencommittee  ; 
-      System.out.println("==================================================");
-      System.out.println("  Welcome to the Club Management System");
-      System.out.println("==================================================");
-      do{
-         System.out.println("=========== the Menu ===========");
-         System.out.println("1- Add a new Committee ");
-         System.out.println("2- Add a Member ");
-         System.out.println("3- Remove a Member ");
-         System.out.println("4- Display Member Report ");
-         System.out.println("5- Calculate Rewards ");
-         System.out.println("6- Edit Member Info ");
-         System.out.println("7- Count Active Members  ");
-         System.out.println("8- Add an Event  ");
-         System.out.println("9- Display Event Report  ");
-         System.out.println("10- Exit ");
-         System.out.println("==================================");
-         System.out.println(" Enter your choice: ");
-         choice= input.nextInt();
-         input.nextLine();
-      
-         switch(choice){
-         //Add a new Committee  
-            case 1:
-               System.out.println("Enter committee name : ");
-               String commName= input.nextLine();
-               if(club.findCommittee(commName) !=null){
-                  System.out.println("the committee  already exist!");
-                  break;}
-            
-            
-               Committee committee=new Committee(commName);
-               if(club.addCommittee(committee))
-                  System.out.println("Committee added successfully. ");
-               else 
-                  System.out.println("Failed to add committee. ");
-               break;
-         
-         // Add a Member 
-             case 2:
-               
-                   InputGUI inputScreen = new InputGUI(null, true, club);
-                    
-                    //inputScreen.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    
-                    inputScreen.setVisible(true);
-                    break;
-         
-         //Remove a Member 
-            case 3:
-               System.out.println("Enter committee name to Remove member to : ");
-               choosencommitteename= input.nextLine();
-               choosencommittee=club.findCommittee(choosencommitteename);
-            
-               if(choosencommittee!=null){
-                  System.out.println("Enter member ID to remove : ");
-                  String removeID= input.next();
-               
-                  if(choosencommittee.removeMember(removeID))
-                     System.out.println("Member removed successfully . ");
-                  else 
-                     System.out.println("Member not found . ");
-               }
-               else 
-                  System.out.println("Committee not found . ");
-               break;
-         
-         
-         
-         //display report of member
-            case 4: 
-               
-                {
-    System.out.println("Enter committee name of the member: ");
-    choosencommitteename = input.nextLine();
-    choosencommittee = club.findCommittee(choosencommitteename);
+        setTitle("Club Management System");
+        setSize(450, 650);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the window on screen
 
-    if (choosencommittee != null) {
-        System.out.println("Enter member ID: ");
-        String ID = input.next();
-        
-        Member m = choosencommittee.searchMember(ID);
-        
-        if (m != null) {
-            java.awt.EventQueue.invokeLater(() -> {
-                new outframgui(m).setVisible(true);
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(new Color(0, 45, 45)); 
+        mainPanel.setLayout(null);
+        add(mainPanel);
+// Menu Title 
+        JLabel lblTitle = new JLabel("Main Menu", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 28));
+        lblTitle.setForeground(Color.WHITE);
+        lblTitle.setBounds(50, 30, 350, 50);
+        mainPanel.add(lblTitle);
+// Create Menu Buttons  
+        String[] labels = {"1. Add Committee", "2. Add New Member", "3. Edit Member Info", 
+                           "4. View Reports", "5. Manage Events", "6. Save & Exit"};
+        // to add Buttons 
+        int yPos = 110;
+        for (int i = 0; i < labels.length; i++) {
+            JButton btn = new JButton(labels[i]);
+            btn.setFont(new Font("Arial", Font.BOLD, 16));
+            btn.setBackground(new Color(230, 230, 230));
+            btn.setBounds(50, yPos, 350, 60);
+            mainPanel.add(btn);
+            yPos += 80;
+           // clicks for each button to open the correct window 
+           int choice = i + 1;
+            btn.addActionListener(e -> {
+                if (choice == 1) new AddCommitteeFrame(club).setVisible(true);
+                else if (choice == 2) new AddMemberFrame(club).setVisible(true);
+                else if (choice == 3) new EditMemberFrame(club).setVisible(true);
+                else if (choice == 4) new ReportsDashboardFrame(club).setVisible(true);
+                else if (choice == 5) new EventFrame(club).setVisible(true);
+                else { saveData(); System.exit(0); }
             });
-        } else {
-            System.out.println("Member not found.");
         }
-    } else {
-        System.out.println("Committee not found.");
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                saveData(); // Auto-save when the user clicks 'X'
+                System.exit(0);
+            }
+        });
+    }
+     // File Operations ***
+    private void loadData() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            club = (Club) ois.readObject(); // Read the club object from the file
+        } catch (FileNotFoundException e) {
+        
+        JOptionPane.showMessageDialog(this," No previous data found. Starting a new system ");
+        club = new Club("University Club");
+
+    } catch (IOException | ClassNotFoundException e) {
+        
+        JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
+        club = new Club("University Club"); 
+    }
+    }
+
+    private void saveData() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            oos.writeObject(club); // Write the entire club object to the file
+            JOptionPane.showMessageDialog(this, "Data Saved Successfully!");
+        } catch (IOException e) { JOptionPane.showMessageDialog(this, "Error Saving Data"); }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new Main().setVisible(true));
     }
 }
-break;
-         
-         //calculate rewards
-            case 5:
-               System.out.println("Enter committee name to calculate rewards: ");
-               choosencommitteename = input.nextLine();
-               choosencommittee = club.findCommittee(choosencommitteename);
+
+//creat basefream to make all frame extend it
+class BaseFrame extends JFrame {
+    protected JPanel leftPanel, rightPanel;
+    protected JButton actionButton;
+
+    public BaseFrame(String title, String btnText) {
+        setTitle(title);
+        setSize(850, 550);
+        setLayout(null);
+        setLocationRelativeTo(null);
+
+        leftPanel = new JPanel();
+        leftPanel.setBackground(new Color(0, 45, 45));
+        leftPanel.setBounds(0, 0, 350, 550);
+        leftPanel.setLayout(null);
+
+        JLabel lblTitle = new JLabel("<html><center>" + title + "</center></html>", SwingConstants.CENTER);
+        lblTitle.setOpaque(true);
+        lblTitle.setBackground(new Color(210, 210, 210));
+        lblTitle.setBounds(50, 60, 250, 70);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        leftPanel.add(lblTitle);
+
+        actionButton = new JButton(btnText);
+        actionButton.setBounds(60, 400, 230, 50);
+        leftPanel.add(actionButton);
+
+        rightPanel = new JPanel();
+        rightPanel.setBackground(new Color(230, 230, 230));
+        rightPanel.setBounds(350, 0, 500, 550);
+        rightPanel.setLayout(null);
+
+        add(leftPanel); add(rightPanel);
+    }
+    //helper method to add a lable and text field easily
+    protected void addField(String label, JComponent comp, int y) {
+        JLabel lbl = new JLabel(label);
+        lbl.setBounds(40, y, 150, 30);
+        comp.setBounds(200, y, 240, 30);
+        rightPanel.add(lbl);
+        rightPanel.add(comp);
+    }
+}
+
+
+class EditMemberFrame extends BaseFrame {
+    private Member mEdit;
+
+    public EditMemberFrame(Club club) {
+        super("Edit Member Info", "Save Changes");
+        JTextField tC = new JTextField(), tI = new JTextField(), tN = new JTextField(), tHours = new JTextField();
+        JCheckBox cA = new JCheckBox("Active Status");
+        JComboBox<String> cP = new JComboBox<>(new String[]{"Leader", "Assistant", "Coordinator"});
+        JLabel lblS = new JLabel("Value:");
+
+        addField("Committee Name:", tC, 40); addField("Member ID:", tI, 90);
+        JButton btnS = new JButton("Find Member");
+        btnS.setBounds(200, 130, 240, 30); rightPanel.add(btnS);
+
+        addField("Update Name:", tN, 180); addField("Status:", cA, 220);
+        lblS.setBounds(40, 270, 150, 30); cP.setBounds(200, 270, 240, 30); tHours.setBounds(200, 270, 240, 30);
+        rightPanel.add(lblS); rightPanel.add(cP); rightPanel.add(tHours);
+        
+        lblS.setVisible(false); cP.setVisible(false); tHours.setVisible(false); actionButton.setEnabled(false);
+
+       //search action //handled action
+        btnS.addActionListener(e -> {
+            Committee c = club.findCommittee(tC.getText());  //find committe
+            if (c != null) {
+                mEdit = c.searchMember(tI.getText()); //find ID 
+                if (mEdit != null) {
+                    tN.setText(mEdit.getName()); cA.setSelected(mEdit.isIsActive());//to show currenr name
+                    lblS.setVisible(true); actionButton.setEnabled(true); //to show current status
+                    // polymorphism check
+                    if (mEdit instanceof BoardMember) {
+                        cP.setVisible(true); tHours.setVisible(false); lblS.setText("New Position:");
+                        cP.setSelectedItem(((BoardMember)mEdit).getPosition());
+                    } else {
+                        tHours.setVisible(true); cP.setVisible(false); lblS.setText("Hours to ADD:"); //to show hours text field
+                        tHours.setText(""); 
+                    }
+                } else JOptionPane.showMessageDialog(this, "Member Not Found!");
+            } else JOptionPane.showMessageDialog(this, "Committee Not Found!");
+        });
+
+        // to save changes action //handled action
+        actionButton.addActionListener(e -> {
+            try {
+                mEdit.setName(tN.getText()); //update name
+                mEdit.setIsActive(cA.isSelected()); //updute status
+                
+                if (mEdit instanceof BoardMember) {
+                    ((BoardMember)mEdit).setPosition((String)cP.getSelectedItem()); //cast and updut position
+                } else if (mEdit instanceof Volunteer) {
+                    
+                    int hoursToAdd = Integer.parseInt(tHours.getText());
+                    ((Volunteer)mEdit).addHours(hoursToAdd); //cast and add hours
+                }
+                
+                JOptionPane.showMessageDialog(this, "Updated Successfully!");
+                dispose(); //close window
+            } catch (IllegalArgumentException ex) { //catch if hours<0
+                
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            } 
+        });
+    }
+}
+
+
+class ReportsDashboardFrame extends BaseFrame {
+    public ReportsDashboardFrame(Club club) {
+        super("System Reports", "Run Report");
+        
+        // i add lebal to count active member
+        JLabel lblActiveCount = new JLabel("Active Members: 0");
+        lblActiveCount.setFont(new Font("Arial", Font.BOLD, 15));
+        lblActiveCount.setForeground(new Color(0, 102, 0)); 
+        lblActiveCount.setBounds(200, 10, 250, 30); 
+        rightPanel.add(lblActiveCount);
+
+        JTextArea outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        outputArea.setFont(new Font("Monospaced", Font.BOLD, 14));
+        outputArea.setBackground(Color.BLACK); 
+        outputArea.setForeground(Color.GREEN);
+        JScrollPane scroll = new JScrollPane(outputArea); 
+        scroll.setBounds(20, 200, 460, 280);
+        rightPanel.add(scroll);
+
+        String[] types = {"Member Report", "Event Report", "All Committee Rewards"};
+        JComboBox<String> combo = new JComboBox<>(types);
+        JTextField tC = new JTextField(), tS = new JTextField();
+        
+        addField("Type:", combo, 50); 
+        addField("Committee:", tC, 100); 
+        addField("ID/Event:", tS, 150);
+        //handled action 
+        actionButton.addActionListener(e -> {
+            outputArea.setText(""); // to clean
             
-               if(choosencommittee != null) {
-                  if(choosencommittee.getMembers().isEmpty() ) {
-                     System.out.println("No members in this committee.");
-                  } else {
-                     System.out.println("=== Rewards Report ===");
-                     Node<Member> current = choosencommittee.getMembers().getFirstNode();
-                  
-                     while (current != null) {
-                        Member m = current.data;
-                        System.out.println("Member: " + m.getName() +
-                                   " | Reward: " + m.calculateReward());
-                        current = current.nextNode;
-                     }
-                  }
-               } else {
-                  System.out.println("Committee not found.");
-               }
-               break;
-         
-         
-         //edit member
-            case 6:
-               System.out.println("Enter committee name of the member to edit: ");
-               choosencommitteename = input.nextLine();
-               choosencommittee = club.findCommittee(choosencommitteename);
-            
-               if (choosencommittee != null) {
-                  System.out.println("Enter member ID to edit: ");
-                  String editID = input.nextLine();
-               
-                  Member mToEdit = choosencommittee.searchMember(editID);
-               
-                  if (mToEdit != null) {
-                     System.out.println("1- Edit Name\n2- Edit Active Status");
-                  
-                     if (mToEdit instanceof BoardMember) {
-                        System.out.println("3- Edit Position");
-                     } else if (mToEdit instanceof Volunteer) {
-                        System.out.println("3- Add Volunteer Hours");
-                     }
-                  
-                     System.out.print("Enter your choice: ");
-                     int editChoice = input.nextInt();
-                     input.nextLine();
-                  
-                     if (editChoice == 1) {
-                        System.out.print("Enter the new name: ");
-                        String newName = input.nextLine();
-                        mToEdit.setName(newName);
-                        System.out.println("Name updated successfully!");
-                     } else if (editChoice == 2) {
-                        System.out.print("Is the member currently active? (true/false): ");
-                        boolean newStatus = input.nextBoolean();
-                        input.nextLine();
-                                
-                        mToEdit.setIsActive(newStatus); 
-                        System.out.println("Status updated successfully!");
-                     } else if (editChoice == 3) {
-                        if (mToEdit instanceof BoardMember) {
-                           BoardMember bm = (BoardMember) mToEdit;
-                           String newPosition = "";
-                           int posChoice;
-                        
-                           do {
-                              System.out.println("Choose new Position:\n1- Leader\n2- Assistant\n3- Coordinator");
-                              System.out.print("Enter choice (1-3): ");
-                              posChoice = input.nextInt();
-                              input.nextLine();
-                           
-                              if (posChoice == 1) newPosition = "Leader";
-                              else if (posChoice == 2) newPosition = "Assistant";
-                              else if (posChoice == 3) newPosition = "Coordinator";
-                              else System.out.println("Invalid choice!");
-                           } while (posChoice < 1 || posChoice > 3);
-                        
-                           bm.setPosition(newPosition);
-                           System.out.println("Position updated successfully!");
-                        
-                        } else if (mToEdit instanceof Volunteer) {
-                           Volunteer vol = (Volunteer) mToEdit;
-                           System.out.print("Enter the number of hours to add: ");
-                           while(!valid){
-                              int newHours = input.nextInt();
-                              input.nextLine();
-                              try{                                                                   
-                                 vol.addHours(newHours);
-                                 break;
-                              }
-                              catch(IllegalArgumentException e){
-                                 System.out.println("Error :"+e.getMessage());
-                                 System.out.print("Please enter a vaild number :");
-                              
-                              }  
-                           }   
-                                    
-                        }
-                     } else {
-                        System.out.println("Invalid choice.");
-                     }
-                  } else {
-                     System.out.println("Member ID not found in this committee.");
-                  }
-               } else {
-                  System.out.println("Committee not found.");
-               }
-               break;
-         
-         //count active members 
-            case 7:
-               System.out.println("Enter committee name to count active members: ");
-               choosencommitteename = input.nextLine();
-               choosencommittee = club.findCommittee(choosencommitteename);
-            
-               if(choosencommittee != null) {
-               
-                  int activeCount = choosencommittee.countActiveMembers();
-                  System.out.println("Total Active Members in '" + choosencommitteename + "' is: " + activeCount);
-               } else {
-                  System.out.println("Committee not found.");
-               }
-               break;
-         
-         
-         //add event
-            case 8: 
-               {
-                  System.out.print("enter event name:") ; 
-                  String eventname=input.next();
-                  System.out.print("enter event date:") ; 
-                  String eventdate=input.next();
-                  System.out.print("enter event location:") ; 
-                  String eventloc=input.next();
-                  Event e = new Event (eventname, eventdate , eventloc ) ; 
-                  if ( club.addEvent(e) )
-                     System.out.println("Event added succesfully!") ; 
-                  else 
-                     System.out.println("failed to add the Event ") ; 
-               }
-               break;
-         
-         //display event
-            case 9: 
-               { 
-                  System.out.print("enter event name : ") ; 
-                  String n = input.next() ; 
-                  Event event = club.getEvent(n) ; 
-                  if ( event != null ) event.displayReport() ; 
-               }
-               break;
-         
-         
-         //exit
-            case 10:
-               System.out.println("Exiting the system...Thank you");
-               saveData(club);
-               break;         }
-      
-      
-      }while(choice !=10);
-   
-   
-   
-   
-   
-      input.close();
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   }
+            // find committe and count member
+            Committee currentComm = club.findCommittee(tC.getText());
+            if (currentComm != null) {
+                lblActiveCount.setText("Active Members (" + currentComm.getCommName() + "): " + currentComm.countActiveMembers());
+            } else {
+                lblActiveCount.setText("Active Members: 0");
+            }
 
+            // for displayReport
+            if (combo.getSelectedIndex() == 0) {
+                if (currentComm != null) { 
+                    Member m = currentComm.searchMember(tS.getText()); 
+                    if (m != null) outputArea.setText(m.displayReport()); //
+                    else outputArea.setText("Member Not Found!");
+                } else {
+                    outputArea.setText("Committee Not Found!");
+                }
+            } 
+            else if (combo.getSelectedIndex() == 1) {
+                Event ev = club.getEvent(tS.getText()); 
+                if (ev != null) outputArea.setText(ev.displayReport()); // 
+                else outputArea.setText("Event Not Found!");
+            } 
+            else {
+                //for count Rewards
+                if (currentComm != null) {
+                    String report = "=== Rewards for " + currentComm.getCommName() + " ===\n";
+                    
+                    Node<Member> curr = currentComm.getMembers().getFirstNode();
+                    while(curr != null) {
+                        report += "Member: " + curr.data.getName() + " | Reward: " + curr.data.calculateReward() + "\n";
+                        curr = curr.nextNode;
+                    }
+                    outputArea.setText(report); 
+                } else {
+                    outputArea.setText("Committee Not Found!");
+                }
+            }
+        });
+    }
+}
 
+//
+class AddMemberFrame extends BaseFrame {
+    public AddMemberFrame(Club club) {
+        super("Add Member Form", "ADD Member");
 
+        JTextField txtComm = new JTextField(), txtID = new JTextField(), txtName = new JTextField(), txtYear = new JTextField("2026");
+        JCheckBox chkActive = new JCheckBox("Active Member");
+        
+        JRadioButton rbVol = new JRadioButton("Volunteer"), rbBoard = new JRadioButton("Board");
+        ButtonGroup bg = new ButtonGroup(); bg.add(rbVol); bg.add(rbBoard);
 
+        
+        JLabel lblSpecial = new JLabel("Special Info:");
+        JComboBox<String> comboPos = new JComboBox<>(new String[]{"Leader", "Assistant", "Coordinator"});
+        JTextField txtHours = new JTextField();
+        
+        lblSpecial.setBounds(40, 340, 150, 30);
+        comboPos.setBounds(200, 340, 240, 30);
+        txtHours.setBounds(200, 340, 240, 30);
+        
+        comboPos.setVisible(false); txtHours.setVisible(false); lblSpecial.setVisible(false);
 
+        addField("Committee Name:", txtComm, 40);
+        addField("ID:", txtID, 90);
+        addField("Name:", txtName, 140);
+        addField("Join Year:", txtYear, 190);
+        addField("Active?", chkActive, 240);
 
+        JPanel pnlType = new JPanel();
+        pnlType.setBorder(BorderFactory.createTitledBorder("Type of Member"));
+        pnlType.setBounds(40, 280, 400, 50);
+        pnlType.add(rbVol); pnlType.add(rbBoard);
+        rightPanel.add(pnlType);
+        rightPanel.add(lblSpecial); rightPanel.add(comboPos); rightPanel.add(txtHours);
 
+        rbBoard.addActionListener(e -> { comboPos.setVisible(true); txtHours.setVisible(false); lblSpecial.setVisible(true); lblSpecial.setText("Choose Position:"); });
+        rbVol.addActionListener(e -> { comboPos.setVisible(false); txtHours.setVisible(true); lblSpecial.setVisible(true); lblSpecial.setText("Enter Hours:"); });
 
+        //handled action
+        actionButton.addActionListener(e -> {
+            try {
+                Committee c = club.findCommittee(txtComm.getText());
+                if (c == null) throw new Exception("Committee Not Found!"); //throw new exception if committe not found
+                c.checkDuplicateID(txtID.getText()); //doublicteIdException
 
+                Member m;
+                if (rbBoard.isSelected()) 
+                    m = new BoardMember((String)comboPos.getSelectedItem(), Integer.parseInt(txtYear.getText()), chkActive.isSelected(), txtID.getText(), txtName.getText());
+                else if (rbVol.isSelected())
+                    m = new Volunteer(Integer.parseInt(txtHours.getText()), Integer.parseInt(txtYear.getText()), chkActive.isSelected(), txtID.getText(), txtName.getText());
+                else throw new Exception("Please select member type!");
 
+                if(c.addMember(m)) { JOptionPane.showMessageDialog(this, "Member Added Successfully!"); dispose(); }
+            } catch (DoublicateIdException ex) { JOptionPane.showMessageDialog(this, ex.getMessage()); //catchers
+            } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage()); }
+        });
+    }
+}
+class AddCommitteeFrame extends BaseFrame {
+    public AddCommitteeFrame(Club club) {
+        super("Add Committee", "Save");
+        JTextField t = new JTextField(); addField("Name:", t, 100);
+        //handied actiion
+        actionButton.addActionListener(e -> {
+            if(club.addCommittee(new Committee(t.getText()))) { JOptionPane.showMessageDialog(this, "Added!"); dispose(); }
+        });
+    }
+}
 
-
-
-
-
+class EventFrame extends BaseFrame {
+    public EventFrame(Club club) {
+        super("Manage Events", "Save");
+        JTextField n = new JTextField(), d = new JTextField(), l = new JTextField();
+        addField("Name:", n, 50); addField("Date:", d, 100); addField("Loc:", l, 150);
+        //handled action
+        actionButton.addActionListener(e -> {
+            if(club.addEvent(new Event(n.getText(), d.getText(), l.getText()))) { JOptionPane.showMessageDialog(this, "Added!"); dispose(); }
+        });
+    }
 }

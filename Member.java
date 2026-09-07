@@ -34,9 +34,10 @@ public abstract class Member extends Person implements Report , Serializable {
    public void setIsActive(boolean isActive) {
       this.isActive = isActive;
    }
+  
    
    //ovrrid method 
-   public void displayReport(){
-      System.out.println(toString());
+   public String displayReport(){
+      return toString();
    }
 }
