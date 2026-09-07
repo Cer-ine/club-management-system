@@ -37,11 +37,11 @@ A Java-based university club management system that streamlines the management o
 ### Event Management
 <img width="1047" height="679" alt="image" src="https://github.com/user-attachments/assets/57344cf6-817c-42f4-875a-bf25ae845918" />
 
-### Reports diqplaying
+### Reports DISPLAYING
 <img width="1045" height="781" alt="image" src="https://github.com/user-attachments/assets/4d21b595-bd91-4387-aa13-eb8a203e8d7f" />
 
 
-## What I Learned
+## What WE Learned
 - Object-oriented programming
 - GUI development with Java Swing
 - File handling and serialization
